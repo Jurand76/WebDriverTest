@@ -80,7 +80,7 @@ namespace WebDriverTest
         private By dropdownIconLocator = By.CssSelector(".dropdown__icon.icon.icon-dots");
         private By replyButtonLocator = By.CssSelector("li.dropdown__item[ng-click='replyToSender(message)']");
 
-
+      
         public string GetText(By locator_param)
         {
             WebDriverWait wait_answer = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
@@ -167,9 +167,9 @@ namespace WebDriverTest
                     if (!unreadFromSelenium1)
                     {
                         messageToClick = message;
-                        unreadFromSelenium1 = true;
-                    }
-                }                                        
+                    unreadFromSelenium1 = true;
+                }
+            }
             }
 
             Assert.IsTrue(unreadFromSelenium1, "No new unread message from Selenium1 account");
