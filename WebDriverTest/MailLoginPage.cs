@@ -14,8 +14,7 @@ namespace WebDriverTest
     {
         public IWebDriver driver;
 
-        // Fields for page elements
-        private readonly By logoutButtonLocator = By.ClassName("account-info__logout");
+        // Fields for page 
         private readonly By rodoPopupContentLocator = By.ClassName("rodo-popup-content");
         private readonly By rodoPopupAgreeLocator = By.ClassName("rodo-popup-agree");
         private readonly By unreadMessageLocator = By.CssSelector("li.msglist-item:not(.msglist-item--seen)");
@@ -28,7 +27,10 @@ namespace WebDriverTest
         private IWebElement passwordField;
 
         [FindsBy(How = How.ClassName, Using = "btn")]
-        private IWebElement buttonField;
+        private IWebElement loginButtonField;
+
+        [FindsBy(How = How.ClassName, Using = "account-info__logout")]
+        private IWebElement logoutButtonField;
 
         public MailLoginPage(IWebDriver browser)
         {
@@ -61,13 +63,12 @@ namespace WebDriverTest
         {
             emailField.SendKeys(email);
             passwordField.SendKeys(password);
-            buttonField.Click();
+            loginButtonField.Click();
         }
 
         public void Logout()
         {
-            IWebElement buttonField = driver.FindElement(logoutButtonLocator);
-            buttonField.Click();
+            logoutButtonField.Click();
         }
 
         public IWebElement FindUnreadMessageFromSender(string senderEmail)
