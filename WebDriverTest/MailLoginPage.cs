@@ -1,11 +1,12 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
-using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SeleniumExtras.PageObjects;
+
 
 namespace WebDriverTest
 {
@@ -13,20 +14,26 @@ namespace WebDriverTest
     {
         public IWebDriver driver;
 
-        // Locators for elements 
-        private readonly By emailLocator = By.Id("email");
-        private readonly By passwordLocator = By.Id("password");
-        private readonly By buttonLocator = By.ClassName("btn");
+        // Fields for page elements
         private readonly By logoutButtonLocator = By.ClassName("account-info__logout");
         private readonly By rodoPopupContentLocator = By.ClassName("rodo-popup-content");
         private readonly By rodoPopupAgreeLocator = By.ClassName("rodo-popup-agree");
         private readonly By unreadMessageLocator = By.CssSelector("li.msglist-item:not(.msglist-item--seen)");
         private readonly By messageSenderInfo = By.CssSelector("span[ng-bind='::message.fromString']");
 
+        [FindsBy(How = How.Id, Using = "email")]
+        private IWebElement emailField;
+
+        [FindsBy(How = How.Id, Using = "password")]
+        private IWebElement passwordField;
+
+        [FindsBy(How = How.ClassName, Using = "btn")]
+        private IWebElement buttonField;
 
         public MailLoginPage(IWebDriver browser)
         {
             this.driver = browser;
+            PageFactory.InitElements(driver, this);
         }
 
         public void NavigateTo(string url)
@@ -52,10 +59,6 @@ namespace WebDriverTest
 
         public void Login(string email, string password)
         {
-            IWebElement emailField = driver.FindElement(emailLocator);
-            IWebElement passwordField = driver.FindElement(passwordLocator);
-            IWebElement buttonField = driver.FindElement(buttonLocator);
-
             emailField.SendKeys(email);
             passwordField.SendKeys(password);
             buttonField.Click();

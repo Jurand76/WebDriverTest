@@ -2,7 +2,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.Chrome;
 using SeleniumExtras.PageObjects;
-using SeleniumExtras.WaitHelpers;
+//using SeleniumExtras.WaitHelpers;
 using System;
 using System.Threading;
 
