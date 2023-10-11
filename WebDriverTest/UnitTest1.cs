@@ -20,20 +20,9 @@ namespace WebDriverTest
         private readonly string email2 = "seleniumtest2@interia.pl";
         private readonly string password1 = "Testowekonto";
         private readonly string password2 = "Testowekonto";
-
-         // Locators for interia.pl mail service
-        private By iFrameLocator = By.CssSelector("iframe[id^='uiTinymce']");
-        private By emailAddressLocator = By.CssSelector("input[ng-model='inputEmail']");
-        private By emailEditArea = By.Id("mceu_15");
-        private By emailContentLocator = By.Id("tinymce");
-        private By sendButtonLocator = By.CssSelector("button[ng-click='sendButtonClickHandler()']");
-        private By notificationMessageLocator = By.ClassName("notification__list");
-        private By senderLocator = By.CssSelector("[title*='seleniumtest1@interia.pl']");
         private string senderAliasCorrect = "Selenium Test";
-        private By dropdownIconLocator = By.CssSelector(".dropdown__icon.icon.icon-dots");
-        private By replyButtonLocator = By.CssSelector("li.dropdown__item[ng-click='replyToSender(message)']");
 
-      
+            
         [SetUp]
         public void Setup()
         {
@@ -68,6 +57,12 @@ namespace WebDriverTest
         public void Test_SendMail()
         {
             By newMessageButtonLocator = By.ClassName("navigation__new__text");
+            By iFrameLocator = By.CssSelector("iframe[id^='uiTinymce']");
+            By emailAddressLocator = By.CssSelector("input[ng-model='inputEmail']");
+            By emailEditArea = By.Id("mceu_15");
+            By emailContentLocator = By.Id("tinymce");
+            By sendButtonLocator = By.CssSelector("button[ng-click='sendButtonClickHandler()']");
+            By notificationMessageLocator = By.ClassName("notification__list");
 
             mailLoginPage.NavigateTo(url);
             mailLoginPage.Login(email1, password1);
@@ -100,6 +95,15 @@ namespace WebDriverTest
         [Test, Order(3)]
         public void Test_Received_Unread_Mail()
         {
+            By iFrameLocator = By.CssSelector("iframe[id^='uiTinymce']");
+            By emailEditArea = By.Id("mceu_15");
+            By emailContentLocator = By.Id("tinymce");
+            By sendButtonLocator = By.CssSelector("button[ng-click='sendButtonClickHandler()']");
+            By notificationMessageLocator = By.ClassName("notification__list");
+            By senderLocator = By.CssSelector("[title*='seleniumtest1@interia.pl']");
+            By dropdownIconLocator = By.CssSelector(".dropdown__icon.icon.icon-dots");
+            By replyButtonLocator = By.CssSelector("li.dropdown__item[ng-click='replyToSender(message)']");
+
             mailLoginPage.NavigateTo(url);
             mailLoginPage.Login(email2, password2);
 
