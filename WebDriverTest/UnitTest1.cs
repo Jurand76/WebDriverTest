@@ -12,6 +12,7 @@ namespace WebDriverTest
     {
         public IWebDriver driver;
         public MailLoginPage mailLoginPage;
+        public WebDriverWait wait;
        
         // URL for mail webpage and logins with passwords to 2 accounts
         private readonly string url = @"https://poczta.interia.pl/logowanie/";
@@ -20,10 +21,7 @@ namespace WebDriverTest
         private readonly string password1 = "Testowekonto";
         private readonly string password2 = "Testowekonto";
 
-        // Locators for interia.pl mail service
-        private By loginLocator = By.ClassName("msglist-header");
-        private By failedLoginLocator = By.ClassName("form__error");
-        private By newMessageButtonLocator = By.ClassName("navigation__new__text");
+         // Locators for interia.pl mail service
         private By iFrameLocator = By.CssSelector("iframe[id^='uiTinymce']");
         private By emailAddressLocator = By.CssSelector("input[ng-model='inputEmail']");
         private By emailEditArea = By.Id("mceu_15");
@@ -36,74 +34,68 @@ namespace WebDriverTest
         private By replyButtonLocator = By.CssSelector("li.dropdown__item[ng-click='replyToSender(message)']");
 
       
-        public string GetText(By locator_param)
-        {
-            WebDriverWait wait_answer = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            IWebElement pageElement = wait_answer.Until(ExpectedConditions.ElementIsVisible(locator_param));
-            return pageElement.Text;
-        }
-
         [SetUp]
         public void Setup()
         {
             driver = new ChromeDriver();
             mailLoginPage = new MailLoginPage(driver);
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
         [Test, Order(0)]
         public void Test_Login_Failed()
         {
+            By failedLoginLocator = By.ClassName("form__error");
             mailLoginPage.NavigateTo(url);
             mailLoginPage.Login(email2, "Badpassword");
-            string failedLoginText = GetText(failedLoginLocator);
+            IWebElement failedLoginMessage = wait.Until(ExpectedConditions.ElementIsVisible(failedLoginLocator));
+            string failedLoginText = failedLoginMessage.Text;
             Assert.IsTrue(failedLoginText.Contains("B³êdny e-mail"), "Bad answer from webpage");
         }
 
         [Test, Order(1)]
         public void Test_Login_Success()
         {
+            By loginLocator = By.ClassName("msglist-header");
             mailLoginPage.NavigateTo(url);
             mailLoginPage.Login(email1, password1);
-            string loginText = GetText(loginLocator);
+            IWebElement loginMessage = wait.Until(ExpectedConditions.ElementIsVisible(loginLocator));
+            string loginText = loginMessage.Text;
             Assert.IsTrue(loginText.Contains("Odebrane"), "Login failed!");
         }
 
         [Test, Order(2)]
         public void Test_SendMail()
         {
+            By newMessageButtonLocator = By.ClassName("navigation__new__text");
+
             mailLoginPage.NavigateTo(url);
             mailLoginPage.Login(email1, password1);
             
             // new message creation
-            IWebElement buttonField = driver.FindElement(newMessageButtonLocator);
-            buttonField.Click();
-            WebDriverWait wait_answer = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            IWebElement emailField = wait_answer.Until(ExpectedConditions.ElementIsVisible(emailAddressLocator));
+            wait.Until(ExpectedConditions.ElementToBeClickable(newMessageButtonLocator)).Click();
+            IWebElement emailField = wait.Until(ExpectedConditions.ElementIsVisible(emailAddressLocator));
             emailField.SendKeys("SeleniumTest2@interia.pl");
 
             // entering content of message
-            IWebElement mailArea = wait_answer.Until(ExpectedConditions.ElementIsVisible(emailEditArea));
-            Thread.Sleep(2000);
+            IWebElement mailArea = wait.Until(ExpectedConditions.ElementToBeClickable(emailEditArea));
             mailArea.Click();
-            wait_answer.Until(ExpectedConditions.FrameToBeAvailableAndSwitchToIt(iFrameLocator));
-            IWebElement bodyElement = wait_answer.Until(ExpectedConditions.ElementIsVisible(emailContentLocator)); 
+            wait.Until(ExpectedConditions.FrameToBeAvailableAndSwitchToIt(iFrameLocator));
+            IWebElement bodyElement = wait.Until(ExpectedConditions.ElementIsVisible(emailContentLocator)); 
             bodyElement.Clear();  
-            Thread.Sleep(2000);
             bodyElement.SendKeys("Testing - sending email to SeleniumTest2@interia.pl");
            
             driver.SwitchTo().DefaultContent();
 
             // sending message
-            wait_answer.Until(ExpectedConditions.ElementToBeClickable(sendButtonLocator));
-            IWebElement sendButton = driver.FindElement(sendButtonLocator);
-            Thread.Sleep(3000);
-            sendButton.Click();
+            wait.Until(ExpectedConditions.ElementToBeClickable(sendButtonLocator)).Click();
 
             // checking if pop-up window with "Wiadomoœæ wys³ana" appeared
-            Thread.Sleep(1000);
-            string responseText = GetText(notificationMessageLocator);
+            IWebElement notificationMessage = wait.Until(ExpectedConditions.ElementIsVisible(notificationMessageLocator));
+            string responseText = notificationMessage.Text;
             Assert.IsTrue(responseText.Contains("wys³ana"), "Sending message failed!");
         }
+
 
         [Test, Order(3)]
         public void Test_Received_Unread_Mail()
@@ -118,7 +110,8 @@ namespace WebDriverTest
             if (messageToClick != null) 
             {
                 messageToClick.Click();
-                string senderAlias = GetText(senderLocator);
+                IWebElement senderMessage = wait.Until(ExpectedConditions.ElementIsVisible(senderLocator));
+                string senderAlias = senderMessage.Text;
                 Console.WriteLine("Sender alias: " + senderAlias);
                 Assert.IsTrue(senderAlias.ToLower() == senderAliasCorrect.ToLower(), "Bad alias name of sender");
 
@@ -131,26 +124,20 @@ namespace WebDriverTest
                     replyButton.Click();
 
                     // entering content of message
-                    IWebElement mailArea = wait.Until(ExpectedConditions.ElementIsVisible(emailEditArea));
-                    Thread.Sleep(2000);
-                    mailArea.Click();
+                    wait.Until(ExpectedConditions.ElementToBeClickable(emailEditArea)).Click();
                     wait.Until(ExpectedConditions.FrameToBeAvailableAndSwitchToIt(iFrameLocator));
                     IWebElement bodyElement = wait.Until(ExpectedConditions.ElementIsVisible(emailContentLocator));
                     bodyElement.Clear();
-                    Thread.Sleep(2000);
                     bodyElement.SendKeys(senderAlias);
 
                     driver.SwitchTo().DefaultContent();
 
                     // sending message
-                    wait.Until(ExpectedConditions.ElementToBeClickable(sendButtonLocator));
-                    IWebElement sendButton = driver.FindElement(sendButtonLocator);
-                    Thread.Sleep(3000);
-                    sendButton.Click();
+                    wait.Until(ExpectedConditions.ElementToBeClickable(sendButtonLocator)).Click();
 
                     // checking if pop-up window with "Wiadomoœæ wys³ana" appeared
-                    Thread.Sleep(1000);
-                    string responseText = GetText(notificationMessageLocator);
+                    IWebElement notificationMessage = wait.Until(ExpectedConditions.ElementIsVisible(notificationMessageLocator));
+                    string responseText = notificationMessage.Text;
                     Assert.IsTrue(responseText.Contains("wys³ana"), "Sending answer to message failed!");
                 }
             }
