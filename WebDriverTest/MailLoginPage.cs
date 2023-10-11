@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SeleniumExtras.PageObjects;
-
+using OpenQA.Selenium.Support.Events;
 
 namespace WebDriverTest
 {
@@ -15,11 +15,6 @@ namespace WebDriverTest
         public IWebDriver driver;
 
         // Fields for page 
-        private readonly By rodoPopupContentLocator = By.ClassName("rodo-popup-content");
-        private readonly By rodoPopupAgreeLocator = By.ClassName("rodo-popup-agree");
-        private readonly By unreadMessageLocator = By.CssSelector("li.msglist-item:not(.msglist-item--seen)");
-        private readonly By messageSenderInfo = By.CssSelector("span[ng-bind='::message.fromString']");
-
         [FindsBy(How = How.Id, Using = "email")]
         private IWebElement emailField;
 
@@ -31,6 +26,7 @@ namespace WebDriverTest
 
         [FindsBy(How = How.ClassName, Using = "account-info__logout")]
         private IWebElement logoutButtonField;
+
 
         public MailLoginPage(IWebDriver browser)
         {
@@ -46,6 +42,8 @@ namespace WebDriverTest
 
         private void CloseRodoPopupIfPresent()
         {
+            By rodoPopupContentLocator = By.ClassName("rodo-popup-content");
+            By rodoPopupAgreeLocator = By.ClassName("rodo-popup-agree");
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             try
             {
@@ -55,7 +53,7 @@ namespace WebDriverTest
             }
             catch (WebDriverTimeoutException ex)
             {
-                Console.WriteLine($"Timeout Exception: {ex.Message}");
+                Console.WriteLine($"Rodo popup - timeout exception: {ex.Message}");
             }
         }
 
@@ -73,7 +71,9 @@ namespace WebDriverTest
 
         public IWebElement FindUnreadMessageFromSender(string senderEmail)
         {
-            var unreadMessages = driver.FindElements(unreadMessageLocator);
+            By messageSenderInfo = By.CssSelector("span[ng-bind='::message.fromString']");
+            By unreadMessagesLocator = By.CssSelector("li.msglist-item:not(.msglist-item--seen)");
+            var unreadMessages = driver.FindElements(unreadMessagesLocator);
 
             foreach (var message in unreadMessages)
             {
